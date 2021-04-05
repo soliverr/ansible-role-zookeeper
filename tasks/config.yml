@@ -1,0 +1,79 @@
+---
+- name: ZK CONFIG| Check configuration backup
+  stat:
+    path: "{{ zookeeper_install_path }}/conf.orig"
+  register: _zk_conf_backup
+
+- name: ZK CONFIG| Backup current configuration
+  block:
+    - name: ZK CONFIG| Save current configuration
+      copy:
+        src: "{{ zookeeper_install_path }}/conf"
+        dest: "{{ zookeeper_install_path }}/conf.orig"
+        owner: "{{ zookeeper_user }}"
+        group: "{{ zookeeper_group }}"
+        remote_src: true
+    - name: ZK CONFIG| Drop current configuration
+      file:
+        path: "{{ zookeeper_install_path }}/conf"
+        state: absent
+    - name: ZK INSTALL| Create symlink for configuration
+      file:
+        src: "{{ zookeeper_etc_dir }}"
+        dest: "{{ zookeeper_install_path }}/conf"
+        owner: "{{ zookeeper_user }}"
+        group: "{{ zookeeper_group }}"
+        state: link
+  when:
+    - not _zk_conf_backup.stat.exists
+
+- name: ZK CONFIG| Generate myid
+  template:
+    src: myid.j2
+    dest: "{{ zookeeper_data_dir }}/myid"
+    force: "{{ zookeeper_force_myid }}"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+
+- name: ZK CONFIG| Generate zoo.cfg
+  template:
+    src: zoo.cfg.j2
+    dest: "{{ zookeeper_etc_dir }}/zoo.cfg"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    force: true
+
+- name: ZK CONFIG| Determine JAVA path for current java
+  shell: "alternatives --display java | grep 'link currently points to' | awk '{ print $NF}' | sed 's:/bin/java::'"
+  register: _java_home_system
+
+- name: ZK CONFIG| Set JAVA_HOME
+  set_fact:
+    java_home: "{{ _java_home_system.stdout }}"
+
+- name: ZK CONFIG| Genereate zookeeper-env.sh
+  template:
+    src: zookeeper-env.sh.j2
+    dest: "{{ zookeeper_etc_dir }}/zookeeper-env.sh"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    force: true
+    mode: '0755'
+
+- name: ZK CONFIG| Generate log4j config
+  template:
+    src: log4j.properties.j2
+    dest: "{{ zookeeper_etc_dir }}/log4j.properties"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    force: true
+
+- name: ZK CONFIG| Genereate system profile
+  template:
+    src: zookeeper-profile.sh.j2
+    dest: "/etc/profile.d/zookeeper-{{ _zookeeper_version }}.sh"
+    owner: "root"
+    group: "root"
+    force: true
+    mode: '0755'
+  when: zookeeper_service_set_default

@@ -1,0 +1,16 @@
+{{ ansible_managed|comment }}
+
+# Source Zookeeper environment
+. {{ zookeeper_etc_dir }}/zookeeper-env.sh
+
+# Export ZooKeeper environment 
+export ZOOCFGDIR
+
+{% if zookeeper_env is defined %}
+{% for key, value in zookeeper_env.items() | sort %}
+export {{key}}
+{% endfor %}
+{% endif %}
+
+# Set up system PATH
+PATH={{ zookeeper_install_path }}/bin:$PATH

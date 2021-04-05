@@ -1,0 +1,99 @@
+---
+## General
+zookeeper_version: 3.6.2
+
+## Using proxy
+use_proxy: false
+
+## Mirror to download archive file
+zookeeper_mirror: "http://artfiles.org/apache.org"
+
+## Service options
+
+# Owner
+zookeeper_user: zookeeper
+zookeeper_group: zookeeper
+
+# start on boot
+zookeeper_service_enabled: false
+# current state: started, stopped
+zookeeper_service_state: stopped
+
+# System service name for ZooKeeper
+zookeeper_service_name: ""
+
+# Set this service as system default
+zookeeper_service_set_default: false
+
+_zookeeper_version: "{{ zookeeper_service_name
+                        if (zookeeper_service_name is defined)
+                            and (zookeeper_service_name|length > 0)
+                        else zookeeper_version }}"
+
+
+_zookeeper_service_name: "{{ 'zookeeper@' + zookeeper_service_name
+                              if (zookeeper_service_name is defined)
+                                  and (zookeeper_service_name|length > 0)
+                              else 'zookeeper' }}"
+
+# Files & Paths
+zookeeper_data_dir: "/var/lib/zookeeper/{{ _zookeeper_version }}"
+zookeeper_log_dir: "/var/log/zookeeper/{{ _zookeeper_version }}"
+zookeeper_data_log_dir: "{{ zookeeper_log_dir }}"
+zookeeper_basic_path: /opt/zookeeper
+zookeeper_install_path: "{{ zookeeper_basic_path }}/{{ zookeeper_version }}"
+zookeeper_etc_base_dir: "/etc/zookeeper"
+zookeeper_etc_dir: "{{ zookeeper_etc_base_dir }}/{{ _zookeeper_version }}"
+
+# Connection properties
+# Deprecated
+client_port: 2181
+# Deprecated
+init_limit: 5
+# Deprecated
+sync_limit: 2
+# Deprecated
+tick_time: 2000
+zookeeper_client_port: "{{ client_port }}"
+zookeeper_init_limit: "{{ init_limit }}"
+zookeeper_sync_limit: "{{ sync_limit }}"
+zookeeper_tick_time: "{{ tick_time }}"
+
+zookeeper_autopurge_purgeInterval: 0
+zookeeper_autopurge_snapRetainCount: 10
+
+# Java options
+zookeeper_jmx_enabled: true
+zookeeper_jmx_port: 1099
+zookeeper_java_opts: "-Djava.net.preferIPv4Stack=true"
+
+# Rolling file appender setttings
+zookeeper_rolling_log_file_max_size: 10MB
+zookeeper_max_rolling_log_file_count: 10
+
+# List of dict (i.e. {zookeeper_hosts:[{host:,id:},{host:,id:},...]})
+zookeeper_hosts:
+  - host: "{{inventory_hostname}}"
+    id: 1
+
+# Dict of ENV settings to be written into the (optional) conf/zookeeper-env.sh
+# zookeeper_env: {}
+zookeeper_env:
+  JAVA_HOME: "{{ java_home }}"
+  SERVER_JVMFLAGS: -Xmx1024m
+  ZOO_LOG_DIR: "{{ zookeeper_log_dir }}"
+  ZOO_LOG4J_PROP: INFO,CONSOLE,ROLLINGFILE
+
+# Controls Zookeeper myid generation
+zookeeper_force_myid: true
+
+zookeeper_force_reinstall: false
+
+zookeeper_4lw_commands_whitelist: stat
+
+#
+# You can add more zookeper config options using zookeeper_config_map
+#
+# zookeeper_config_map:
+#  - key: traceFile
+#    value: zoo-trace.log

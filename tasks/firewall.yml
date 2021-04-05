@@ -1,0 +1,20 @@
+---
+- name: ZK FIREWALL| Check if firewall is running
+  shell: "systemctl status firewalld | grep -iqs'Active: active'"
+  register: _firewall_status
+  failed_when: "_firewall_status.rc == 3"
+  check_mode: false
+  changed_when: false
+
+
+- name: ZK FIREWALL| Ensure that firewall allows zk ports
+  ansible.posix.firewalld:
+    port: "{{ item  }}"
+    state: enabled
+    permanent: true
+    immediate: true
+  with_items:
+    - "{{ client_port }}/tcp"
+    - 2888/tcp
+    - 3888/tcp
+  when: _firewall_status.stdout != ''

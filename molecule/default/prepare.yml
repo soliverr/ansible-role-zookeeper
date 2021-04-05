@@ -1,0 +1,10 @@
+---
+- name: Install required roles
+  hosts: all
+  roles:
+    - geerlingguy.java
+  tasks:
+    - name: Install net-tools package
+      ansible.builtin.package:
+        name: net-tools
+        state: present

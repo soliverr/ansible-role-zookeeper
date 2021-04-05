@@ -1,0 +1,25 @@
+{{ ansible_managed|comment }}
+
+{% if _zookeeper_service_name != 'zookeeper' %}
+	{% set env_path = zookeeper_etc_base_dir + '/%i' %}
+{% else %}
+	{% set env_path = zookeeper_etc_dir  %}
+{% endif %}
+
+[Unit]
+Description=ZooKeeper Service for version {{ zookeeper_version }} 
+After=network.target
+
+[Service]
+# Fix issue with stopping process https://stackoverflow.com/questions/45953678/unit-falling-into-a-failed-state-status-143-when-stopping-service
+SuccessExitStatus=143
+Type=forking
+User={{ zookeeper_user }}
+Group={{ zookeeper_group }}
+EnvironmentFile={{ env_path }}/zookeeper-env.sh
+ExecStart={{ zookeeper_install_path }}/bin/zkServer.sh start
+ExecStop={{ zookeeper_install_path }}/bin/zkServer.sh stop
+ExecReload={{ zookeeper_install_path }}/bin/zkServer.sh restart
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+# This file describes roles which should be installed for project work.
+# It should be used with ansible-galaxy command, as follow:
+# ansible-galaxy install -r requirements.yml
+---
+collections:
+  - name: ansible.posix

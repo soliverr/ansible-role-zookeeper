@@ -1,0 +1,26 @@
+---
+- name: ZK SERVICE| Autodetection of running ZK service
+  shell:
+    cmd: "systemctl list-units --type=service --state=running | awk '/zookeeper/ {print $1}'"
+  register: zk_running_service
+  ignore_errors: true
+
+- name: ZK SERVICE| Create systemd service
+  template:
+    src: zookeeper.service.j2
+    dest: "/etc/systemd/system/{{ _zookeeper_service_name }}.service"
+
+- name: ZK SERVICE| Stop and disable current ZK service {{ zk_running_service.stdout }} in case force_reinstall
+  service:
+    name: "{{ zk_running_service.stdout }}"
+    state: stopped
+    enabled: false
+  when: zookeeper_force_reinstall
+  ignore_errors: true
+
+- name: ZK SERVICE| Configure and start service {{ _zookeeper_service_name }}
+  service:
+    name: "{{ _zookeeper_service_name }}"
+    state: "{{ zookeeper_service_state }}"
+    enabled: "{{ zookeeper_service_enabled }}"
+    daemon_reload: true
