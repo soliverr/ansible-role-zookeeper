@@ -1,18 +1,8 @@
 ---
 - name: ZK INSTALL| Installing dependencies
-  yum:
+  package:
     name: "{{ zookeeper_required_libs }}"
     state: present
-
-- name: ZK INSTALL| Ensure ZooKeeper group
-  group:
-    name: "{{ zookeeper_group }}"
-
-- name: ZK INSTALL| Ensure ZooKeeper user
-  user:
-    name: "{{ zookeeper_user }}"
-    group: "{{ zookeeper_group }}"
-  ignore_errors: true
 
 - name: ZK INSTALL| Check ZK install dir existance
   stat:
@@ -55,21 +45,7 @@
   failed_when: zookeeper_check.rc == 1 or 'is not currently serving requests' in zookeeper_check.stdout
   ignore_errors: true
 
-- name: ZK INSTALL| Untar ZooKeeper using proxy
-  unarchive:
-    extra_opts: ['--strip-components=1']
-    src: "{{ zookeeper_url }}"
-    remote_src: true
-    dest: "{{ zookeeper_install_path }}"
-    owner: "root"
-    group: "root"
-  environment:
-    https_proxy: "http://{{ proxy_settings.proxy_user }}:{{ proxy_settings.proxy_user_pass }}@{{ proxy_settings.proxy_server }}:{{ proxy_settings.proxy_server_port }}"
-  when:
-    - use_proxy
-    - not zk_install_path.stat.exists or zookeeper_force_reinstall
-
-- name: ZK INSTALL| Untar ZooKeeper
+- name: ZK INSTALL| Untar ZooKeeper {{ zookeeper_version }}
   unarchive:
     extra_opts: ['--strip-components=1']
     src: "{{ zookeeper_url }}"
@@ -78,7 +54,6 @@
     owner: "root"
     group: "root"
   when:
-    - not use_proxy
     - not zk_install_path.stat.exists or zookeeper_force_reinstall
 
 - name: ZK INSTALL| Fix configuration permissions
@@ -89,7 +64,7 @@
     state: directory
     recurse: true
 
-- name: ZK INSTALL| Clean up bin dir. Get file list
+- name: ZK INSTALL| Get file list to clean
   find:
     paths: "{{ zookeeper_install_path }}/bin"
     file_type: file
@@ -101,5 +76,3 @@
     path: "{{ item.path }}"
     state: absent
   with_items: "{{ _zk_bin_files_to_delete.files }}"
-
-

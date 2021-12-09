@@ -1,4 +1,9 @@
 ---
+- name: ZK CONFIG| Check configuration
+  stat:
+    path: "{{ zookeeper_install_path }}/conf"
+  register: _zk_conf_dir
+
 - name: ZK CONFIG| Check configuration backup
   stat:
     path: "{{ zookeeper_install_path }}/conf.orig"
@@ -26,6 +31,7 @@
         state: link
   when:
     - not _zk_conf_backup.stat.exists
+    - _zk_conf_dir.stat.exists
 
 - name: ZK CONFIG| Generate myid
   template:
@@ -35,7 +41,7 @@
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
 
-- name: ZK CONFIG| Generate zoo.cfg
+- name: ZK CONFIG| Generate static zoo.cfg
   template:
     src: zoo.cfg.j2
     dest: "{{ zookeeper_etc_dir }}/zoo.cfg"
@@ -43,13 +49,24 @@
     group: "{{ zookeeper_group }}"
     force: true
 
+- name: ZK CONFIG| Generate dynamic zoo.cfg
+  template:
+    src: zoo.dynamic.cfg.j2
+    dest: "{{ zookeeper_dynamic_config_file }}"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    force: true
+  when: zookeeper_reconfig
+
 - name: ZK CONFIG| Determine JAVA path for current java
   shell: "alternatives --display java | grep 'link currently points to' | awk '{ print $NF}' | sed 's:/bin/java::'"
   register: _java_home_system
+  when: zookeeper_setup_java_home
 
 - name: ZK CONFIG| Set JAVA_HOME
   set_fact:
     java_home: "{{ _java_home_system.stdout }}"
+  when: zookeeper_setup_java_home
 
 - name: ZK CONFIG| Genereate zookeeper-env.sh
   template:
@@ -71,7 +88,7 @@
 - name: ZK CONFIG| Genereate system profile
   template:
     src: zookeeper-profile.sh.j2
-    dest: "/etc/profile.d/zookeeper-{{ _zookeeper_version }}.sh"
+    dest: "/etc/profile.d/zookeeper.sh"
     owner: "root"
     group: "root"
     force: true

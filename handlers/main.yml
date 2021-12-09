@@ -2,6 +2,6 @@
 
 - name: Restart zookeeper
   systemd:
-    name: zookeeper
+    name: "{{ _zookeeper_service_name }}"
     state: restarted
   when: zookeeper_service_state != 'stopped'

@@ -5,6 +5,18 @@
   hosts: all
   gather_facts: false
   tasks:
+    - name: Check static config file exists
+      stat:
+        path: "/etc/zookeeper/molecule/zoo.cfg"
+      register: stat_static_config
+      failed_when: not stat_static_config.stat.exists
+
+    - name: Check dynamic config file exists
+      stat:
+        path: "/etc/zookeeper/molecule/zoo.cfg.dynamic"
+      register: stat_dynamic_config
+      failed_when: not stat_dynamic_config.stat.exists
+
     - name: Gather facts on listening ports
       listen_ports_facts:
 
@@ -19,6 +31,6 @@
 
     - name: Check that ZooKeeper log file exists
       stat:
-        path: /var/log/zookeeper/molecule/zookeeper-zookeeper-server-centos7.log
+        path: "/var/log/zookeeper/molecule/zookeeper-zookeeper-server-centos7.log"
       register: stat_log_result
       failed_when: not stat_log_result.stat.exists

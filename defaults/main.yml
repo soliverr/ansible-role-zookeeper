@@ -1,9 +1,6 @@
 ---
 ## General
-zookeeper_version: 3.6.2
-
-## Using proxy
-use_proxy: false
+zookeeper_version: 3.6.3
 
 ## Mirror to download archive file
 zookeeper_mirror: "http://artfiles.org/apache.org"
@@ -45,22 +42,21 @@ zookeeper_install_path: "{{ zookeeper_basic_path }}/{{ zookeeper_version }}"
 zookeeper_etc_base_dir: "/etc/zookeeper"
 zookeeper_etc_dir: "{{ zookeeper_etc_base_dir }}/{{ _zookeeper_version }}"
 
-# Connection properties
-# Deprecated
-client_port: 2181
-# Deprecated
-init_limit: 5
-# Deprecated
-sync_limit: 2
-# Deprecated
-tick_time: 2000
-zookeeper_client_port: "{{ client_port }}"
-zookeeper_init_limit: "{{ init_limit }}"
-zookeeper_sync_limit: "{{ sync_limit }}"
-zookeeper_tick_time: "{{ tick_time }}"
-
+# Static connection properties
+zookeeper_client_port: 2181
+zookeeper_init_limit: 5
+zookeeper_sync_limit: 2
+zookeeper_tick_time: 2000
 zookeeper_autopurge_purgeInterval: 0
 zookeeper_autopurge_snapRetainCount: 10
+zookeeper_4lw_commands_whitelist: stat
+
+# Standalone mode
+zookeeper_standalaone: false
+
+# Dynamic reconfiguration
+zookeeper_reconfig: true
+zookeeper_dynamic_config_file: "{{ zookeeper_etc_dir }}/zoo.cfg.dynamic"
 
 # Java options
 zookeeper_jmx_enabled: true
@@ -71,10 +67,19 @@ zookeeper_java_opts: "-Djava.net.preferIPv4Stack=true"
 zookeeper_rolling_log_file_max_size: 10MB
 zookeeper_max_rolling_log_file_count: 10
 
+# Specify servers and client ports:
+# server.<positive id> = <address1>:<port1>:<port2>[:role];[<client port address>:]<client port>po
+#
 # List of dict (i.e. {zookeeper_hosts:[{host:,id:},{host:,id:},...]})
 zookeeper_hosts:
   - host: "{{inventory_hostname}}"
     id: 1
+    port1: 2888
+    port2: 3888
+
+# Automatically determine and setup JAVA_HOME
+java_home: nil
+zookeeper_setup_java_home: true
 
 # Dict of ENV settings to be written into the (optional) conf/zookeeper-env.sh
 # zookeeper_env: {}
@@ -87,13 +92,16 @@ zookeeper_env:
 # Controls Zookeeper myid generation
 zookeeper_force_myid: true
 
+# Controls reinstall software
 zookeeper_force_reinstall: false
 
-zookeeper_4lw_commands_whitelist: stat
 
 #
-# You can add more zookeper config options using zookeeper_config_map
+# You can add more zookeper config options using zookeeper_config_map and zookeeper_dynamic_config_map
 #
 # zookeeper_config_map:
 #  - key: traceFile
 #    value: zoo-trace.log
+#
+zookeeper_config_map: {}
+zookeeper_dynamic_config_map: {}

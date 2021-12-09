@@ -5,6 +5,12 @@
   register: zk_running_service
   ignore_errors: true
 
+- name: "ZK CONFIG| Create symlink for Systemd sysconfig file"
+  file:
+    src: "{{ zookeeper_etc_dir }}/zookeeper-env.sh"
+    dest: "/etc/sysconfig/{{ _zookeeper_service_name }}"
+    state: link
+
 - name: ZK SERVICE| Create systemd service
   template:
     src: zookeeper.service.j2

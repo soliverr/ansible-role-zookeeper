@@ -4,7 +4,7 @@
   vars:
     zookeeper_service_name: molecule
     zookeeper_service_set_default: true
-    zookeeper_service_enabled: yes
+    zookeeper_service_enabled: true
     zookeeper_service_state: started
   tasks:
     - name: "Install and configure ZooKeeper"

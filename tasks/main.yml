@@ -1,5 +1,14 @@
 ---
 
+- name: ZOOKEEPER | User
+  import_tasks: user.yml
+  tags:
+    - zookeeper
+    - zookeeper_install
+    - zookeeper_user
+    - install
+    - user
+
 - name: ZOOKEEPER | Install
   import_tasks: install.yml
   tags:

@@ -3,7 +3,6 @@
 ZOOCFGDIR={{ zookeeper_etc_dir }}
 
 {% if zookeeper_env is defined %}
-# systemd block
 {% for key, value in zookeeper_env.items() | sort %}
 {{key}}={{value}}
 {% endfor %}

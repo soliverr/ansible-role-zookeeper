@@ -8,9 +8,11 @@ export ZOOCFGDIR
 
 {% if zookeeper_env is defined %}
 {% for key, value in zookeeper_env.items() | sort %}
+{% if value | length > 0 %}
 export {{key}}
+{% endif %}
 {% endfor %}
 {% endif %}
 
 # Set up system PATH
-PATH={{ zookeeper_install_path }}/bin:$PATH
+[[ "$PATH" =~ (^|:)"{{ zookeeper_install_path }}/bin"(|/)(:|$) ]] || PATH={{ zookeeper_install_path }}/bin:$PATH

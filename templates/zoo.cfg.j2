@@ -1,30 +1,33 @@
+{{ ansible_managed|comment }}
+
 tickTime={{ zookeeper_tick_time }}
 dataDir={{ zookeeper_data_dir }}
 dataLogDir={{ zookeeper_data_log_dir }}
-clientPort={{ zookeeper_client_port }}
+# clientPort={{ zookeeper_client_port }}
 initLimit={{ zookeeper_init_limit }}
 syncLimit={{ zookeeper_sync_limit }}
+standaloneEnabled={{ zookeeper_standalaone }}
+reconfigEnabled={{ zookeeper_reconfig }}
+{% if zookeeper_reconfig %}
+dynamicConfigFile={{ zookeeper_dynamic_config_file }}
+{% endif %}
 
 {% if zookeeper_autopurge_purgeInterval > 0 %}
 autopurge.purgeInterval={{ zookeeper_autopurge_purgeInterval }}
 autopurge.snapRetainCount={{ zookeeper_autopurge_snapRetainCount }}
 {% endif %}
 
+{% if not zookeeper_reconfig %}
 {% for server in zookeeper_hosts %}
-{% if server.host is defined %}
-{% if server.ip is defined %}
-server.{{server.id}}={{server.ip}}:2888:3888
-{% else %}
-server.{{server.id}}={{server.host}}:2888:3888
-{% endif %}
-{% else %}
-server.{{loop.index}}={{server}}:2888:3888
-{% endif %}
+server.{{server.id | default(loop.index)}}={{server.host}}:{{server.port1 | default(2888)}}:{{server.port2 | default(3888)}};{{ server.client_port | default(zookeeper_client_port)}}
 {% endfor %}
+{% endif %}
 
 {% if zookeeper_config_map is defined %}
 {% for config in zookeeper_config_map %}
+{% if config.value|string|length > 0 %}
 {{config.key}}={{config.value}}
+{% endif %}
 {% endfor %}
 {% endif %}
 

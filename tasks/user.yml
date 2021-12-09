@@ -1,0 +1,11 @@
+---
+
+- name: ZK USER| Ensure ZooKeeper group
+  group:
+    name: "{{ zookeeper_group }}"
+
+- name: ZK USER| Ensure ZooKeeper user
+  user:
+    name: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+  ignore_errors: true
