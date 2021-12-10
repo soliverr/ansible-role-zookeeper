@@ -41,13 +41,22 @@
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
 
-- name: ZK CONFIG| Generate configuration in zoo.cfg
+- name: ZK CONFIG| Generate static configuration file zoo.cfg
   template:
     src: zoo.cfg.j2
     dest: "{{ zookeeper_etc_dir }}/zoo.cfg"
     owner: "{{ zookeeper_user }}"
     group: "{{ zookeeper_group }}"
     force: true
+
+- name: ZK CONFIG| Generate dynamic configuration file
+  template:
+    src: zoo.cfg.dynamic.j2
+    dest: "{{ zookeeper_dynamic_config_file }}"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    force: true
+  when: zookeeper_dynamic_config
 
 - name: ZK CONFIG| Determine JAVA path for current java
   shell: "alternatives --display java | grep 'link currently points to' | awk '{ print $NF}' | sed 's:/bin/java::'"

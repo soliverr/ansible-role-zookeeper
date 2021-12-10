@@ -29,7 +29,9 @@ autopurge.snapRetainCount={{ zookeeper_autopurge_snapRetainCount }}
 4lw.commands.whitelist={{ zookeeper_4lw_commands_whitelist }}
 {% endif %}
 
+{% if not zookeeper_dynamic_config %}
 {% for server in zookeeper_hosts %}
 server.{{server.id | default(loop.index)}}={{server.host}}:{{server.port1 | default(2888)}}:{{server.port2 | default(3888)}};{{ server.client_port | default(zookeeper_client_port)}}
 {% endfor %}
+{% endif %}
 
