@@ -34,18 +34,18 @@
         - "{{ zookeeper_data_dir }}"
         - "{{ zookeeper_log_dir }}"
 
-- name: ZK INSTALL| Check ZooKeeper version
-  shell: |
-    set -o pipefail && \
-    echo status | nc localhost 2181
-  register: zookeeper_check
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: zookeeper_check.rc == 1 or 'is not currently serving requests' in zookeeper_check.stdout
-  ignore_errors: true
+# - name: ZK INSTALL| Check ZooKeeper version
+#  shell: |
+#    set -o pipefail && \
+#    echo status | nc localhost 2181
+#  register: zookeeper_check
+#  args:
+#    executable: /bin/bash
+#  changed_when: false
+#  failed_when: zookeeper_check.rc == 1 or 'is not currently serving requests' in zookeeper_check.stdout
+#  ignore_errors: true
 
-- name: ZK INSTALL| Untar ZooKeeper {{ zookeeper_version }}
+- name: ZK INSTALL| Unarchive ZooKeeper {{ zookeeper_version }}
   unarchive:
     extra_opts: ['--strip-components=1']
     src: "{{ zookeeper_url }}"

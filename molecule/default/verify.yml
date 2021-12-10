@@ -11,11 +11,12 @@
       register: stat_static_config
       failed_when: not stat_static_config.stat.exists
 
-    - name: Check dynamic config file exists
-      stat:
-        path: "/etc/zookeeper/molecule/zoo.cfg.dynamic"
-      register: stat_dynamic_config
-      failed_when: not stat_dynamic_config.stat.exists
+    # TODO: get name of file from zoo.cfg
+    # - name: Check dynamic config file exists
+    #  stat:
+    #    path: "/etc/zookeeper/molecule/zoo.cfg.dynamic"
+    #  register: stat_dynamic_config
+    #  failed_when: not stat_dynamic_config.stat.exists
 
     - name: Gather facts on listening ports
       listen_ports_facts:

@@ -52,18 +52,18 @@ zookeeper_autopurge_snapRetainCount: 10
 zookeeper_4lw_commands_whitelist: stat
 
 # Standalone mode
-zookeeper_standalaone: false
+zookeeper_standalone: false
 
-# Dynamic reconfiguration
-zookeeper_reconfig: true
-zookeeper_dynamic_config_file: "{{ zookeeper_etc_dir }}/zoo.cfg.dynamic"
+# Dynamic configuration
+zookeeper_dynamic_config: true
+zookeeper_dynamic_config_file: "{{ zookeeper_data_dir }}/zoo.cfg.dynamic"
 
 # Java options
 zookeeper_jmx_enabled: true
 zookeeper_jmx_port: 1099
 zookeeper_java_opts: "-Djava.net.preferIPv4Stack=true"
 
-# Rolling file appender setttings
+# Rolling file appender settings
 zookeeper_rolling_log_file_max_size: 10MB
 zookeeper_max_rolling_log_file_count: 10
 
@@ -95,13 +95,11 @@ zookeeper_force_myid: true
 # Controls reinstall software
 zookeeper_force_reinstall: false
 
-
 #
-# You can add more zookeper config options using zookeeper_config_map and zookeeper_dynamic_config_map
+# You can add more zookeper config options using zookeeper_config_map
 #
 # zookeeper_config_map:
 #  - key: traceFile
 #    value: zoo-trace.log
 #
 zookeeper_config_map: {}
-zookeeper_dynamic_config_map: {}
