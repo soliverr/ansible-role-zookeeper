@@ -70,9 +70,11 @@
     file_type: file
     patterns: "*.cmd"
   register: _zk_bin_files_to_delete
+  when: ansible_os_family  != "Windows"
 
 - name: ZK INSTALL| Clean up bin dir. Remove Files
   file:
     path: "{{ item.path }}"
     state: absent
   with_items: "{{ _zk_bin_files_to_delete.files }}"
+  when: ansible_os_family  != "Windows"
