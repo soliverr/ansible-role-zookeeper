@@ -61,6 +61,8 @@
 - name: ZK CONFIG| Determine JAVA path for current java
   shell: "alternatives --display java | grep 'link currently points to' | awk '{ print $NF}' | sed 's:/bin/java::'"
   register: _java_home_system
+  environment:
+    LANG: "C"
   when: zookeeper_setup_java_home
 
 - name: ZK CONFIG| Set JAVA_HOME
