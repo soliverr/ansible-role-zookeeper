@@ -84,7 +84,7 @@ zookeeper_setup_java_home: true
 # Dict of ENV settings to be written into the (optional) conf/zookeeper-env.sh
 # zookeeper_env: {}
 zookeeper_env:
-  JAVA_HOME: "{{ java_home | default(ommit) }}"
+  JAVA_HOME: "{{ java_home | default(omit) }}"
   SERVER_JVMFLAGS: -Xmx1024m
   ZOO_LOG_DIR: "{{ zookeeper_log_dir }}"
   ZOO_LOG4J_PROP: INFO,CONSOLE,ROLLINGFILE
